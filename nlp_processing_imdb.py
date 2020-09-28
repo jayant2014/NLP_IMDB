@@ -6,6 +6,7 @@ from sklearn import naive_bayes
 from sklearn import metrics
 from sklearn import model_selection
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 def nlp_linear_regression(xtrain, xtest, train_df):
     # Initialize and fit logistic regression model
@@ -32,6 +33,30 @@ def nlp_naive_bayes(xtrain, xtest, train_df):
     # Calculate accuracy
     accuracy = metrics.accuracy_score(test_df.sentiment, predictions)
     return accuracy
+
+def count_vectorizer(train_df, test_df):
+    # Using CountVectorizer
+    count_vec = CountVectorizer(tokenizer = word_tokenize, token_pattern = None)
+        
+    # Fit the vectorizer with training data
+    count_vec.fit(train_df.review)
+
+    # Transform training and validation data
+    xtrain = count_vec.transform(train_df.review)
+    xtest = count_vec.transform(test_df.review)
+
+    return xtrain, xtest
+
+def tfidf_vectorizer(train_df, test_df):
+    # Initialize using Tfidf vectorizer
+    tfidf_vec = TfidfVectorizer(tokenizer = word_tokenize, token_pattern = None)
+    tfidf_vec.fit(train_df.review)
+
+    # Transform training and validation data
+    xtrain = tfidf_vec.transform(train_df.review)
+    xtest = tfidf_vec.transform(test_df.review)
+
+    return xtrain, xtest
 
 if __name__ == "__main__":
     model = "naivebayes"
@@ -60,14 +85,11 @@ if __name__ == "__main__":
         train_df = df[df.kfold != fold_].reset_index(drop = True)
         test_df = df[df.kfold == fold_].reset_index(drop = True)
 
-        count_vec = CountVectorizer(tokenizer = word_tokenize, token_pattern = None)
+        # Using count vectorizer
+        #(xtrain, xtest) = tfidf_vectorizer(train_df, test_df)
 
-        # Fit the vectorizer with training data
-        count_vec.fit(train_df.review)
-
-        # Transform training and validation data
-        xtrain = count_vec.transform(train_df.review)
-        xtest = count_vec.transform(test_df.review)
+        # Using tfidf vectorizer
+        (xtrain, xtest) = tfidf_vectorizer(train_df, test_df)
 
         if model == "linear":
             print("Using Linear Regression Model")
