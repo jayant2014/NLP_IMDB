@@ -2,11 +2,39 @@ import pandas as pd
 
 from nltk.tokenize import word_tokenize
 from sklearn import linear_model
+from sklearn import naive_bayes
 from sklearn import metrics
 from sklearn import model_selection
 from sklearn.feature_extraction.text import CountVectorizer
 
+def nlp_linear_regression(xtrain, xtest, train_df):
+    # Initialize and fit logistic regression model
+    model = linear_model.LogisticRegression()
+    model.fit(xtrain, train_df.sentiment)
+
+    # Make predictions on test data
+    predictions = model.predict(xtest)
+
+    # Calculate accuracy
+    accuracy = metrics.accuracy_score(test_df.sentiment, predictions)
+    return accuracy
+
+def nlp_naive_bayes(xtrain, xtest, train_df):
+    # Initialize the Naive-Bayes model
+    model = naive_bayes.MultinomialNB()
+
+    # Fit the model
+    model.fit(xtrain, train_df.sentiment)
+
+    # Make predictions on test data
+    predictions = model.predict(xtest)
+        
+    # Calculate accuracy
+    accuracy = metrics.accuracy_score(test_df.sentiment, predictions)
+    return accuracy
+
 if __name__ == "__main__":
+    model = "naivebayes"
     df = pd.read_csv("IMDB_Dataset.csv")
 
     # Map positive sentiment to 1 and negative to 0
@@ -41,16 +69,12 @@ if __name__ == "__main__":
         xtrain = count_vec.transform(train_df.review)
         xtest = count_vec.transform(test_df.review)
 
-        # Initialize and fit logistic regression model
-        model = linear_model.LogisticRegression()
-        model.fit(xtrain, train_df.sentiment)
-
-        # Make predictions on test data
-        predictions = model.predict(xtest)
-
-        # Calculate accuracy
-        accuracy = metrics.accuracy_score(test_df.sentiment, predictions)
-
+        if model == "linear":
+            print("Using Linear Regression Model")
+            accuracy = nlp_linear_regression(xtrain, xtest, train_df)
+        elif model == "naivebayes":
+            print("Using Naive Bayes Model")
+            accuracy = nlp_naive_bayes(xtrain, xtest, train_df)
         print("================")
         print(f"Fold : {fold_}")
         print(f"Accuracy : {accuracy}")
