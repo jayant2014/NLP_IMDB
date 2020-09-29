@@ -9,6 +9,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 def nlp_linear_regression(xtrain, xtest, train_df):
+    print("Using Linear Regression Algorithm...")
     # Initialize and fit logistic regression model
     model = linear_model.LogisticRegression()
     model.fit(xtrain, train_df.sentiment)
@@ -21,6 +22,7 @@ def nlp_linear_regression(xtrain, xtest, train_df):
     return accuracy
 
 def nlp_naive_bayes(xtrain, xtest, train_df):
+    print("Using Naive-Bayes Algorithm...")
     # Initialize the Naive-Bayes model
     model = naive_bayes.MultinomialNB()
 
@@ -35,6 +37,7 @@ def nlp_naive_bayes(xtrain, xtest, train_df):
     return accuracy
 
 def count_vectorizer(train_df, test_df):
+    print("Using counter vectorizer")
     # Using CountVectorizer
     count_vec = CountVectorizer(tokenizer = word_tokenize, token_pattern = None)
         
@@ -48,8 +51,21 @@ def count_vectorizer(train_df, test_df):
     return xtrain, xtest
 
 def tfidf_vectorizer(train_df, test_df):
+    print("Using tfidf vectorizer")
     # Initialize using Tfidf vectorizer
     tfidf_vec = TfidfVectorizer(tokenizer = word_tokenize, token_pattern = None)
+    tfidf_vec.fit(train_df.review)
+
+    # Transform training and validation data
+    xtrain = tfidf_vec.transform(train_df.review)
+    xtest = tfidf_vec.transform(test_df.review)
+
+    return xtrain, xtest
+
+def tfidf_vectorizer_ngram(train_df, test_df):
+    print("Using tfidf vectorizer with ngram")
+    # Initialize using Tfidf vectorizer
+    tfidf_vec = TfidfVectorizer(tokenizer = word_tokenize, token_pattern = None, ngram_range = (1, 3))
     tfidf_vec.fit(train_df.review)
 
     # Transform training and validation data
@@ -89,7 +105,10 @@ if __name__ == "__main__":
         #(xtrain, xtest) = tfidf_vectorizer(train_df, test_df)
 
         # Using tfidf vectorizer
-        (xtrain, xtest) = tfidf_vectorizer(train_df, test_df)
+        #(xtrain, xtest) = tfidf_vectorizer(train_df, test_df)
+
+        # Using tfidf vectorizer and ngram
+        (xtrain, xtest) = tfidf_vectorizer_ngram(train_df, test_df)
 
         if model == "linear":
             print("Using Linear Regression Model")
